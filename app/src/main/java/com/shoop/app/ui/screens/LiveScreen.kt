@@ -68,7 +68,7 @@ fun LiveScreen(
             )
             StatCard(
                 title = "Battery",
-                value = state.batteryPercent?.let { "$it%" } ?: "--",
+                value = state.batteryPercent?.let { if (it < 0) "N/A" else "$it%" } ?: "--",
                 accent = ShoopGreen,
                 modifier = Modifier.weight(1f),
             )

@@ -147,6 +147,8 @@ class BandClient(private val context: Context) {
             g.setCharacteristicNotification(hr, true)
             val ccc = hr.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID)
             if (ccc != null) {
+                // GATT operations must be serialized: the battery read is issued
+                // from onDescriptorWrite once the bus is free, not here.
                 if (Build.VERSION.SDK_INT >= 33) {
                     g.writeDescriptor(ccc, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
                 } else {
@@ -155,8 +157,9 @@ class BandClient(private val context: Context) {
                     @Suppress("DEPRECATION")
                     g.writeDescriptor(ccc)
                 }
+            } else {
+                readBatteryLevel(g)
             }
-            batteryCharacteristic?.let { g.readCharacteristic(it) }
             _connection.value = ConnectionState.Streaming(g.device.name ?: "band")
         }
 
@@ -172,14 +175,30 @@ class BandClient(private val context: Context) {
             value: ByteArray,
         ) = handleHr(value)
 
+        override fun onDescriptorWrite(g: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+            if (descriptor.uuid == CLIENT_CHARACTERISTIC_CONFIG_UUID) readBatteryLevel(g)
+        }
+
+        /** Battery level is optional: -1 means the band does not expose the standard Battery Service. */
+        private fun readBatteryLevel(g: BluetoothGatt) {
+            val ch = batteryCharacteristic
+            if (ch == null) {
+                _battery.value = -1
+                return
+            }
+            val started = g.readCharacteristic(ch)
+            if (!started) _battery.value = -1
+        }
+
         override fun onCharacteristicRead(
             g: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
             value: ByteArray,
             status: Int,
         ) {
-            if (characteristic.uuid == BATTERY_LEVEL_UUID && value.isNotEmpty()) {
-                _battery.value = value[0].toInt() and 0xFF
+            if (characteristic.uuid == BATTERY_LEVEL_UUID) {
+                _battery.value =
+                    if (status == BluetoothGatt.GATT_SUCCESS && value.isNotEmpty()) value[0].toInt() and 0xFF else -1
             }
         }
 

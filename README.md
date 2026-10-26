@@ -8,12 +8,17 @@ Shoop is written from scratch in Kotlin with Jetpack Compose (Material 3).
 
 ## Screenshots
 
+Real device: Shoop v1.0.0 streaming from a WHOOP 5.0 (Galaxy A35, 26 Oct 2026):
+
+| Live (streaming) | Today | Sleep |
+|---|---|---|
+| ![Live on WHOOP 5.0](docs/screenshots/real_live.jpg) | ![Today](docs/screenshots/real_today.jpg) | ![Sleep](docs/screenshots/real_sleep.jpg) |
+
+UI renders of the app's own code through Android's layoutlib (Paparazzi), demo data:
+
 | Live | Today | Sleep | Trends |
 |---|---|---|---|
 | ![Live](docs/screenshots/screen_live.png) | ![Today](docs/screenshots/screen_today.png) | ![Sleep](docs/screenshots/screen_sleep.png) | ![Trends](docs/screenshots/screen_trends.png) |
-
-Screenshots are real renders of the app's own UI code, produced through Android's
-layoutlib (Paparazzi) with demo data - see *Testing* below for exactly what that means.
 
 ## Features
 
@@ -51,6 +56,13 @@ Requirements: JDK 17, Android SDK (platform 35, build-tools 35.0.0).
 A prebuilt debug APK is attached to the latest
 [release](https://github.com/nekxxy/shoop/releases).
 
+## Changelog
+
+- **1.0.1** (26 Oct 2026): fix battery read on real bands - GATT operations are now
+  serialized (battery is read after the notification descriptor write completes, not
+  concurrently); bands without the standard Battery Service show "N/A" instead of "--".
+- **1.0.0** (26 Oct 2026): first release.
+
 ## Install
 
 1. Download the APK from Releases onto your phone.
@@ -59,6 +71,11 @@ A prebuilt debug APK is attached to the latest
 4. Open Shoop, grant Bluetooth permission, tap **Find band**, pick your band.
 
 ## Testing status - verified vs untested
+
+**Verified on real hardware (WHOOP 5.0, "WHOOP 5B01482427", Galaxy A35, 26 Oct 2026):**
+- Scan, connect and service discovery against the physical band.
+- Live heart-rate streaming (75 BPM on capture) and RR-interval-based RMSSD (120 ms
+  on capture) through the standard Heart Rate Service with HR Broadcast enabled.
 
 **Verified in this repo's CI-style local run:**
 - Compiles clean (AGP 8.7.3, Kotlin 2.0.21, compileSdk 35, minSdk 26).
@@ -69,12 +86,11 @@ A prebuilt debug APK is attached to the latest
   the real parsing/scoring pipeline using the demo source.
 
 **Not yet verified:**
-- **Pairing with a physical WHOOP 5.0 has NOT been tested** - no band was available to
-  the developer environment. WHOOP 5.0/MG is known to refuse parts of the classic
-  pairing handshake with third-party apps, so live BLE streaming from a 5.0 may need
-  follow-up work. With *HR Broadcast* enabled the band advertises the standard Heart
-  Rate Service, which is what Shoop reads - this is expected to work, but it is
-  unproven until tried on real hardware.
+- Sleep, recovery and strain scores against real overnight/all-day band data - the
+  formulas are unit-tested, but no real night has been recorded yet.
+- Battery level on WHOOP 5.0: v1.0.1 fixes a GATT serialization bug that dropped the
+  battery read; if the 5.0 does not expose the standard Battery Service over its
+  broadcast profile, Shoop shows "N/A" instead of a number.
 - Sleep detection currently scores recordings you capture overnight; automatic
   sleep-stage detection (deep/REM) is not claimed.
 - Background recording (screen off) is not in v1; keep the app open while recording.
