@@ -16,9 +16,9 @@ Real device: Shoop v1.0.0 streaming from a WHOOP 5.0 (Galaxy A35, 26 Oct 2026):
 
 UI renders of the app's own code through Android's layoutlib (Paparazzi), demo data:
 
-| Live | Today | Sleep | Trends |
+| My Day | Live | Sleep | Trends |
 |---|---|---|---|
-| ![Live](docs/screenshots/screen_live.png) | ![Today](docs/screenshots/screen_today.png) | ![Sleep](docs/screenshots/screen_sleep.png) | ![Trends](docs/screenshots/screen_trends.png) |
+| ![My Day](docs/screenshots/screen_overview.png) | ![Live](docs/screenshots/screen_live.png) | ![Sleep](docs/screenshots/screen_sleep.png) | ![Trends](docs/screenshots/screen_trends.png) |
 
 ## Features
 
@@ -58,6 +58,12 @@ A prebuilt debug APK is attached to the latest
 
 ## Changelog
 
+- **1.1.0** (26 Oct 2026): WHOOP-style UI redesign - dark card-based "My Day" overview
+  (sleep ring, recovery semicircle gauge, strain ring), health-monitor grid (resting HR
+  and HRV from real data; SpO2 and respiratory rate shown as N/A because the BLE
+  broadcast does not carry them - nothing is faked), card-styled Live/Sleep/Trends,
+  sectioned trend charts. Style inspiration only: no WHOOP logos, wordmarks, fonts,
+  icons or assets.
 - **1.0.1** (26 Oct 2026): fix battery read on real bands - GATT operations are now
   serialized (battery is read after the notification descriptor write completes, not
   concurrently); bands without the standard Battery Service show "N/A" instead of "--".

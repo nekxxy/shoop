@@ -4,11 +4,11 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.shoop.app.ui.screens.LiveScreen
 import com.shoop.app.ui.screens.LiveUiState
+import com.shoop.app.ui.screens.OverviewScreen
+import com.shoop.app.ui.screens.OverviewUiState
 import com.shoop.app.ui.screens.SleepHistoryItem
 import com.shoop.app.ui.screens.SleepScreen
 import com.shoop.app.ui.screens.SleepUiState
-import com.shoop.app.ui.screens.TodayScreen
-import com.shoop.app.ui.screens.TodayScreenState
 import com.shoop.app.ui.screens.TrendsScreen
 import com.shoop.app.ui.screens.TrendsUiState
 import com.shoop.app.ui.theme.ShoopTheme
@@ -25,6 +25,23 @@ class ScreenshotTest {
     val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_6)
 
     @Test
+    fun overview() {
+        paparazzi.snapshot {
+            ShoopTheme {
+                OverviewScreen(
+                    OverviewUiState(
+                        dateText = "Sunday, 26 October",
+                        strain = 11.4, recovery = 78, sleepScore = 84,
+                        restingHr = 54, rmssdMs = 52.0, asleepMinutes = 432.0,
+                        sampleCount = 812,
+                        recoverySeries = listOf(55f, 62f, 48f, 70f, 74f, 66f, 78f),
+                    )
+                )
+            }
+        }
+    }
+
+    @Test
     fun live() {
         paparazzi.snapshot {
             ShoopTheme {
@@ -36,15 +53,6 @@ class ScreenshotTest {
                     ),
                     onScan = {}, onStop = {}, onConnectFirst = {}, onToggleDemo = {},
                 )
-            }
-        }
-    }
-
-    @Test
-    fun today() {
-        paparazzi.snapshot {
-            ShoopTheme {
-                TodayScreen(TodayScreenState(strain = 11.4, recovery = 78, sleepScore = 84, sampleCount = 812, restingHr = 54))
             }
         }
     }

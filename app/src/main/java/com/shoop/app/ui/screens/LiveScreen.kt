@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -15,13 +17,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shoop.app.ui.components.StatCard
+import com.shoop.app.ui.components.HealthCell
+import com.shoop.app.ui.components.ShoopCardBox
 import com.shoop.app.ui.components.ZoneBar
+import com.shoop.app.ui.theme.ShoopBlue
 import com.shoop.app.ui.theme.ShoopGreen
 import com.shoop.app.ui.theme.ShoopMuted
+import com.shoop.app.ui.theme.ShoopYellow
 
 data class LiveUiState(
     val bpm: Int?,
@@ -43,53 +49,58 @@ fun LiveScreen(
     onToggleDemo: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp),
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (state.isDemo) {
-            Text("DEMO DATA - simulated, not your band", color = com.shoop.app.ui.theme.ShoopYellow, fontSize = 12.sp)
+            Text("DEMO DATA - simulated, not your band", color = ShoopYellow, fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
         }
-        Spacer(Modifier.height(12.dp))
-        Text(
-            state.bpm?.toString() ?: "--",
-            color = ShoopGreen, fontSize = 96.sp, fontWeight = FontWeight.Bold,
-        )
-        Text("BPM", color = ShoopMuted, fontSize = 16.sp)
-        Spacer(Modifier.height(16.dp))
-        ZoneBar(activeZone = state.zone, modifier = Modifier.padding(horizontal = 8.dp))
-        Spacer(Modifier.height(20.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(
-                title = "HRV (RMSSD)",
-                value = state.rmssdMs?.let { "%.0f ms".format(it) } ?: "--",
-                accent = com.shoop.app.ui.theme.ShoopBlue,
-                modifier = Modifier.weight(1f),
-            )
-            StatCard(
-                title = "Battery",
-                value = state.batteryPercent?.let { if (it < 0) "N/A" else "$it%" } ?: "--",
-                accent = ShoopGreen,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Spacer(Modifier.height(20.dp))
-        Text(state.connectionText, color = ShoopMuted, fontSize = 13.sp)
-        Spacer(Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(
-                onClick = if (state.scanning) onStop else onScan,
-                colors = ButtonDefaults.buttonColors(containerColor = ShoopGreen),
-            ) { Text(if (state.scanning) "Stop scan" else "Find band", color = androidx.compose.ui.graphics.Color.Black) }
-            OutlinedButton(onClick = onToggleDemo) {
-                Text(if (state.isDemo) "Use real band" else "Demo mode")
+        ShoopCardBox(Modifier.fillMaxWidth()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    state.bpm?.toString() ?: "--",
+                    color = ShoopGreen, fontSize = 88.sp, fontWeight = FontWeight.Bold,
+                )
+                Text("BPM", color = ShoopMuted, fontSize = 14.sp, letterSpacing = 2.sp)
+                Spacer(Modifier.height(14.dp))
+                ZoneBar(activeZone = state.zone)
             }
         }
-        if (state.deviceNames.isNotEmpty()) {
-            Spacer(Modifier.height(12.dp))
-            state.deviceNames.take(4).forEach { name ->
-                OutlinedButton(onClick = onConnectFirst, modifier = Modifier.fillMaxWidth()) {
-                    Text("Connect: $name")
+        Spacer(Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            HealthCell(
+                null, "HRV (RMSSD)",
+                state.rmssdMs?.let { "%.0f ms".format(it) } ?: "--",
+                Modifier.weight(1f), ShoopBlue,
+            )
+            HealthCell(
+                null, "Battery",
+                state.batteryPercent?.let { if (it < 0) "N/A" else "$it%" } ?: "--",
+                Modifier.weight(1f), ShoopGreen,
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        ShoopCardBox(Modifier.fillMaxWidth()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Text(state.connectionText, color = ShoopMuted, fontSize = 13.sp)
+                Spacer(Modifier.height(12.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = if (state.scanning) onStop else onScan,
+                        colors = ButtonDefaults.buttonColors(containerColor = ShoopGreen),
+                    ) { Text(if (state.scanning) "Stop scan" else "Find band", color = Color.Black) }
+                    OutlinedButton(onClick = onToggleDemo) {
+                        Text(if (state.isDemo) "Use real band" else "Demo mode")
+                    }
+                }
+                if (state.deviceNames.isNotEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    state.deviceNames.take(4).forEach { name ->
+                        OutlinedButton(onClick = onConnectFirst, modifier = Modifier.fillMaxWidth()) {
+                            Text("Connect: $name")
+                        }
+                    }
                 }
             }
         }
