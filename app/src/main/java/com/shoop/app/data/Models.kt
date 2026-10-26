@@ -55,3 +55,21 @@ data class LiveReading(
     val zone: Int,
     val connectedDeviceName: String?,
 )
+
+/** A manually logged activity (no fake sensor data - time and label only). */
+@Serializable
+data class ManualActivity(
+    val id: String,
+    val label: String,
+    val startedEpochMs: Long,
+    val durationMinutes: Int,
+    val avgHr: Int? = null,   // filled when HR samples overlap the window
+    val strain: Double? = null,
+)
+
+/** Habit journal: named habits with per-date checkmarks (ISO date strings). */
+@Serializable
+data class HabitJournal(
+    val habits: List<String> = listOf("Workout", "No late caffeine", "Reading"),
+    val checks: Map<String, List<String>> = emptyMap(), // date -> checked habit names
+)

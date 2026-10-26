@@ -58,6 +58,15 @@ A prebuilt debug APK is attached to the latest
 
 ## Changelog
 
+- **1.2.0** (26 Oct 2026): My Day extended toward the official-app layout - top
+  sleep/recovery/strain pills, ACTIVITIES list (recorded sleep + manual entries with
+  HR-derived strain when the band was streaming), + ADD ACTIVITY and START/STOP live
+  activity recording, MY JOURNAL habit strip (7-day checkmarks, % accomplished, tap to
+  toggle today's habits - all stored locally), and a My Dashboard section: sleep debt,
+  sleep consistency, sleep performance, sleep efficiency, resting HR, weekly zone 1-3
+  time, and strain & recovery trend charts. Everything is computed from recorded HR
+  history or manual entries (formulas in docs/SCORING.md); no steps/stress/SpO2
+  invention. 7 new unit tests for the dashboard metrics (26 total).
 - **1.1.0** (26 Oct 2026): WHOOP-style UI redesign - dark card-based "My Day" overview
   (sleep ring, recovery semicircle gauge, strain ring), health-monitor grid (resting HR
   and HRV from real data; SpO2 and respiratory rate shown as N/A because the BLE
